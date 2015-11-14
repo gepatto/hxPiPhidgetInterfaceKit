@@ -1,0 +1,12 @@
+{
+  "name": "hxPiPhidgetInterfaceKit",
+  "url": "",
+  "license": "MIT",
+  "tags": [],
+  "description": "",
+  "version": "0.1.0",
+  "releasenote": "Requires libphidget-2.1.8.20150410 and libusb-dev to be installed",
+  "contributors": ["Patrick Gutlich"],
+  "dependencies": {
+  }
+}
