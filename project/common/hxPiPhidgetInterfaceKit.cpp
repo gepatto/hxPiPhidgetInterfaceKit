@@ -6,9 +6,24 @@
 
 static AutoGCRoot* g_haxeCallbackForDispatchingEvents = NULL;
 
+struct AutoHaxe
+{
+	int base;
+	const char *message;
+	AutoHaxe(const char *inMessage)
+	{  
+		base = 0;
+		message = inMessage;
+		gc_set_top_of_stack(&base,true);
+	}
+	~AutoHaxe()
+	{
+		gc_set_top_of_stack(0,true);
+	}
+};
+
 namespace hxpiphidgetinterfacekit {
-	
-	//
+
 	CPhidgetInterfaceKitHandle ifKit = 0;
 
 	/**
@@ -19,12 +34,11 @@ namespace hxpiphidgetinterfacekit {
         return g_haxeCallbackForDispatchingEvents;
     }
     
-    /**
+	/**
 	*
 	*/
     void SetHaxeCallbackForDispatchingEvents(AutoGCRoot* haxeCallback)
     {
-    	printf("%s\n","SetHaxeCallbackForDispatchingEvents");
         if (g_haxeCallbackForDispatchingEvents)
         {
             delete g_haxeCallbackForDispatchingEvents;
@@ -81,7 +95,7 @@ namespace hxpiphidgetinterfacekit {
 	{
         va_list params;
         va_start(params, eventClassSpec);
-		
+		::AutoHaxe haxe("Invoke");
 		InvokeHaxeCallbackFunctionForDispatchingEvents(0, eventClassSpec, params);
 		
 		va_end(params);
@@ -115,11 +129,12 @@ namespace hxpiphidgetinterfacekit {
 		setSensorsChangeTrigger(20);
 		
 		DispatchEventToHaxe("phidgets.event.IKEvent", 
-			hxpiphidgetinterfacekit::CSTRING, "ikevent_device_attach",
+			hxpiphidgetinterfacekit::CSTRING, "ik_event_device_attach",
 			hxpiphidgetinterfacekit::CSTRING, name,
 			hxpiphidgetinterfacekit::CINT, serialNo,  
 			hxpiphidgetinterfacekit::CEND); 
-
+		
+		printf("%s %10d attached!\n", name, serialNo);
 		return 0;
 	}
 
@@ -136,7 +151,7 @@ namespace hxpiphidgetinterfacekit {
 
 		
 		DispatchEventToHaxe( "phidgets.event.IKEvent", 
-			hxpiphidgetinterfacekit::CSTRING,  "ikevent_device_detach",
+			hxpiphidgetinterfacekit::CSTRING,  "ik_event_device_detach",
 			hxpiphidgetinterfacekit::CSTRING, name,
 			hxpiphidgetinterfacekit::CINT, serialNo,
 		 	hxpiphidgetinterfacekit::CEND); 
@@ -160,15 +175,14 @@ namespace hxpiphidgetinterfacekit {
 	* @param Index - Index of the input that generated the event, 
 	* @param State - boolean (0 or 1) representing the input state (on or off)
 	*/
-	int CCONV InputChangeHandler(CPhidgetInterfaceKitHandle IFK, void *usrptr, int Index, int State)
+	int CCONV InputChangeHandler(CPhidgetInterfaceKitHandle IFKH, void *usrptr, int Index, int State)
 	{
-		
+
 		DispatchEventToHaxe( "phidgets.event.IKDataEvent", 
-			hxpiphidgetinterfacekit::CSTRING,  "ikevent_input_change",	
+			hxpiphidgetinterfacekit::CSTRING,  "ik_data_event_input_change",	
 			hxpiphidgetinterfacekit::CINT, Index,  
 			hxpiphidgetinterfacekit::CINT, State,
 			hxpiphidgetinterfacekit::CEND); 
-		//printf("Digital Input: %d > State: %d\n", Index, State);
 		return 0;
 	}
 
@@ -177,14 +191,15 @@ namespace hxpiphidgetinterfacekit {
 	* @param Index - Index of the output that generated the event
 	* @param State - boolean (0 or 1) representing the output state (on or off)
 	*/
-	int CCONV OutputChangeHandler(CPhidgetInterfaceKitHandle IFK, void *usrptr, int Index, int State)
+	int CCONV OutputChangeHandler(CPhidgetInterfaceKitHandle IFKH, void *usrptr, int Index, int State)
 	{
+		
+
 		DispatchEventToHaxe( "phidgets.event.IKDataEvent", 
-			hxpiphidgetinterfacekit::CSTRING,  "ikevent_output_change",	
+			hxpiphidgetinterfacekit::CSTRING,  "ik_data_event_output_change",	
 			hxpiphidgetinterfacekit::CINT, Index,  
 			hxpiphidgetinterfacekit::CINT, State,
 			hxpiphidgetinterfacekit::CEND); 
-		//printf("Digital Output: %d > State: %d\n", Index, State);
 		return 0;
 	}
 
@@ -193,16 +208,14 @@ namespace hxpiphidgetinterfacekit {
 	* @param Index - Index of the output that generated the event
 	* @param Value - the sensor read value
 	*/
-	int CCONV SensorChangeHandler(CPhidgetInterfaceKitHandle IFK, void *usrptr, int Index, int Value)
+	int CCONV SensorChangeHandler(CPhidgetInterfaceKitHandle IFKH, void *usrptr, int Index, int Value)
 	{
-		
+
 		DispatchEventToHaxe( "phidgets.event.IKDataEvent", 
-		 	hxpiphidgetinterfacekit::CSTRING,  "ikevent_sensor_change",	
+		 	hxpiphidgetinterfacekit::CSTRING,  "ik_data_event_sensor_change",	
 			hxpiphidgetinterfacekit::CINT, Index,  
 		 	hxpiphidgetinterfacekit::CINT, Value,
 		 	hxpiphidgetinterfacekit::CEND); 
-		
-		//printf("Sensor: %d > Value: %d\n", Index, Value);
 		return 0;
 	}
 
@@ -284,7 +297,6 @@ namespace hxpiphidgetinterfacekit {
 		if((result = CPhidget_waitForAttachment((CPhidgetHandle)ifKit, 500)))
 		{
 			CPhidget_getErrorDescription(result, &err);
-			//printf("Problem waiting for attachment: %s\n", err);
 		}
 		
 	}

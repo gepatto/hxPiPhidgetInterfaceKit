@@ -3,6 +3,7 @@ package phidgets;
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
 import phidgets.event.IKEvent;
+import phidgets.event.IKDataEvent;
 import openfl.display.Sprite;
 import openfl.display.Stage;
 import haxe.Json;
@@ -71,7 +72,6 @@ class PhidgetInterfaceKit {
 
 		var id = s_nextEventDispatcherId++;
 		s_eventDispatcherMap.set(id, obj);
-		trace("RegisterEventDispatcher: " + id);
 		return id;
 	}
 	
@@ -87,7 +87,7 @@ class PhidgetInterfaceKit {
      */
     private static function CreateAndDispatchEvent(eventDispatcherId:Int, eventPackageAndClass:String, args:Array<Dynamic>) : Void
     {
-       // TraceEvent(eventPackageAndClass, args);
+        //TraceEvent(eventPackageAndClass, args);
       
         var eventClass = Type.resolveClass(eventPackageAndClass);
         if (eventClass == null)

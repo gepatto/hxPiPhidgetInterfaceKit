@@ -2,11 +2,11 @@
   "name": "hxPiPhidgetInterfaceKit",
   "url": "",
   "license": "MIT",
-  "tags": [],
-  "description": "",
-  "version": "0.1.0",
-  "releasenote": "Requires libphidget-2.1.8.20150410 and libusb-dev to be installed",
-  "contributors": ["Patrick Gutlich"],
+  "tags": ["Phidgets","IO","Analog Input","Raspberry Pi"],
+  "description": "hxPiPhidgetInterfaceKit is an openfl extension that allows access to the Phidgets InterfaceKit boards like the 8/8/8 and enables reading analog sensor input and digital in/output",
+  "version": "0.9.0",
+  "releasenote": "Requires libphidget-2.1.8.20150410 and libusb-dev to be installed. For root-less access copy udev rule from folder dependencies",
+  "contributors": ["Patrick Gutlich (Gepatto)"],
   "dependencies": {
   }
 }
